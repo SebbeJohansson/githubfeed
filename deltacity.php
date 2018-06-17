@@ -20,6 +20,7 @@
 <?php
 
     global $selfmade;
+    $selfmade = new SelfMade(SelfMade::defaultUsername, SelfMade::defaultToken, "https://api.github.com/repos/fakedy/DeltaCity/commits");
     $selfmade->debugmode = false;
 
     $selfmade->SetEvents("https://api.github.com/repos/fakedy/DeltaCity/commits");
