@@ -1,0 +1,19 @@
+.newday::before{
+    position: absolute;
+    top: 5px;
+    left: 7px;
+    bottom: -11px;
+    width: 5px;
+    background-color: #dbdbdb;
+    content: ' ';
+}
+.newday::after{
+    position: absolute;
+    top: 5px;
+    left: 11px;
+    height: 5px;
+    width: 16px;
+    background-color: #dbdbdb;
+    content: ' ';
+    border-radius: 1000px;
+}
