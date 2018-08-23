@@ -23,7 +23,7 @@ function FeedDisplay(){
 
             if(successful){
                 //console.log(response['variables']['output']);
-                console.log($("#githubfeed"));
+                //console.log($("#githubfeed"));
                 $("#githubfeed").html(response['variables']['output']);
             }else{
                 alert(statusmessage);

@@ -15,7 +15,7 @@
         const defaultURL = "https://api.github.com/users/SebbeJohansson/events";
 
         private $curl = null;
-        private $url = null;
+        public $url = null;
         public $debugmode = false;
 
         public $xml = "";
@@ -25,33 +25,37 @@
 
         public $response = array('successful' => false, 'errors' => array(), 'statusmessage' => "", 'variables' => array());
 
-        function __construct($username, $personalaccesstoken, $url = "https://api.github.com/events") {
+        function __construct($username, $personalaccesstoken, $url = SelfMade::defaultURL) {
+
+            if($url == ""){
+                $this->response['errors'][] = "Api URL not set - Defaulting to ".SelfMade::defaultURL.".";
+                $this->url = SelfMade::defaultURL;
+            }
+            if($personalaccesstoken == ""){
+                $this->response['errors'][] = "Token not set - Defaulting to ".SelfMade::defaultToken.".";
+                $personalaccesstoken = SelfMade::defaultToken;
+            }
+            if($username == ""){
+                $this->response['errors'][] = "Username not set - Defaulting to ".SelfMade::defaultUsername.".";
+                $username = SelfMade::defaultUsername;
+            }
+
             $this->curl = $curl = curl_init("curl -u $username:$personalaccesstoken https://api.github.com/user");
 
-            $this->url = $url;
-
-            curl_setopt($curl, CURLOPT_URL, $url);
+            curl_setopt($curl, CURLOPT_URL, $this->url);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-Type: application/json', "User-Agent: https://api.github.com/user", "Authorization: token $personalaccesstoken"));
 
             $content = curl_exec($curl);
             if($this->debugmode){
-                var_dump($content);
-                echo "</br>";
-                echo "</br>";
+                $this->response['variables']['content'] = $content;
             }
             $this->events = json_decode($content,TRUE);
 
             $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             if($this->debugmode){
-                var_dump($http_status);
-                echo "</br>";
-                echo "</br>";
-            }
-
-            if(!isset($this->events) || $this->events == NULL || empty($this->events)){
-                $this->response['errors'][] = "No events. Error. Terminating.";
+                $this->response['variables']['http_status'] = $http_status;
             }
 
         }
@@ -75,12 +79,7 @@
             return $max_depth;
         }
 
-        public function SetEvents($url = null){
-            if(!isset($url)){
-                $this->response['errors'][] = "No url found. Defaulting to $this->url";
-                $url = $this->url;
-            }
-
+        public function SetEvents($url = SelfMade::defaultURL){
 
             curl_setopt($this->curl, CURLOPT_URL, $url);
 
@@ -194,6 +193,11 @@
 
         public function GetGithubFeed() {
             global $selfmade;
+            if($selfmade->events == NULL){
+                $selfmade->response['statusmessage'] = "No events for github api url.";
+
+                return "Wow no events";
+            }
             $lastauthor = null;
             $lastday = null;
             $newday = null;
